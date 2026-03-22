@@ -57,4 +57,33 @@ enum Mood: Hashable, CaseIterable{
             "boredColor"
         }
     }
+    var searchTerm: String {
+        switch self {
+        case .Happy:
+            return "happy"
+        case .Chill:
+            return "lofi"
+        case .Angry:
+            return "rock"
+        case .Sad:
+            return "sad"
+        case .Bored:
+            return "party"
+        }
+    }
+    var quoteCategory: String {
+        switch self {
+        case .Happy:
+            return "happiness"
+        case .Chill:
+            return "life"
+        case .Angry:
+            return "success"
+        case .Sad:
+            return "inspirational"
+        case .Bored:
+            return "funny"
+        }
+    }
+
 }
