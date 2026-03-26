@@ -45,6 +45,40 @@ class NetworkClient {
         
         return song
     }
-}
+    
+    func fetchShow(mood: Mood) async throws -> Show {
+        
+        let term = mood.movieGenre
+        
+        let url = URL(string: "https://api.tvmaze.com/search/shows?q=\(term)")!
+        
+        let (data, _) = try await URLSession.shared.data(from: url)
+        
+        let response = try JSONDecoder().decode([ShowResponse].self, from: data)
+        
+        guard let show = response.randomElement()?.show else {
+            throw URLError(.badServerResponse)
+        }
+        
+        return show
+    }
+    
+    func fetchWeather() async throws -> CurrentCondition {
 
+        guard let url = URL(string: "https://wttr.in/Athens?format=j1") else {
+            throw URLError(.badURL)
+        }
+        
+        let (data, _) = try await URLSession.shared.data(from: url)
+        
+
+        let response = try JSONDecoder().decode(WeatherResponse.self, from: data)
+        
+
+        guard let current = response.current_condition.first else {
+            throw NSError(domain: "No data", code: 0, userInfo: nil)
+        }
+        
+        return current
+    }}
 

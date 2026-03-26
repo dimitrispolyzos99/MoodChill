@@ -15,6 +15,7 @@ class RecommendationViewModel : ObservableObject {
     @Published var firstSong: Song?
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var show: Show?
     
     @Published var isPlaying = false
     
@@ -57,6 +58,16 @@ class RecommendationViewModel : ObservableObject {
         
         isLoading = false
     }
+    func fetchShow(mood: Mood) async {
+        
+        do {
+            let result = try await networkClient.fetchShow(mood: mood)
+            show = result
+        } catch {
+            print(error)
+        }
+    }
+
     
     func fetchQuote(mood: Mood) async {
         isLoading = true

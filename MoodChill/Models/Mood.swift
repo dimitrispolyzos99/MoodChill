@@ -85,5 +85,19 @@ enum Mood: Hashable, CaseIterable{
             return "funny"
         }
     }
+    var movieGenre: String {
+        switch self {
+        case .Happy:
+            return "comedy"
+        case .Chill:
+            return "thriller"
+        case .Angry:
+            return "action"
+        case .Sad:
+            return "drama"
+        case .Bored:
+            return "fantasy"
+        }
+    }
 
 }

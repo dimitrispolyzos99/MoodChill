@@ -21,7 +21,7 @@ struct RecommendationView: View {
             ScrollView {
                 VStack(spacing: 20) {
                     
-
+                    
                     VStack(spacing: 8) {
                         Text("Today's Mood")
                             .font(.subheadline)
@@ -73,16 +73,51 @@ struct RecommendationView: View {
                                 )
                             }
                         }
-
-                        SectionCardView(title: "Show", text: "Coming soon")
-                        SectionCardView(title: "Game", text: "Coming soon")
+                        
+                        if let show = recomended.show {
+                            
+                            VStack(spacing: 12) {
+                                
+                                if let imageUrl = show.image?.medium,
+                                   let url = URL(string: imageUrl) {
+                                    
+                                    AsyncImage(url: url) { image in
+                                        image
+                                            .resizable()
+                                            .scaledToFill()
+                                            .frame(maxWidth: .infinity)
+                                    } placeholder: {
+                                        ProgressView()
+                                    }
+                                    .frame(height: 180)
+                                    .clipped()
+                                    .cornerRadius(16)
+                                    
+                                    Text(show.name)
+                                        .font(.headline)
+                                    
+                                    if let summary = show.summary {
+                                        Text(summary.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression))
+                                            .font(.subheadline)
+                                            .opacity(0.8)
+                                            .lineLimit(3)
+                                    }
+                                }
+                            }
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(Color.black.opacity(0.7))
+                            )
+                        }
                     }
+                    
                 }
                 .padding()
                 .padding(.bottom, recomended.firstSong != nil ? 100 : 0)
             }
             
-
+            
             if let song = recomended.firstSong {
                 VStack {
                     Spacer()
@@ -102,7 +137,7 @@ struct RecommendationView: View {
                         Button {
                             recomended.togglePlay()
                         } label: {
-                            Image(systemName: recomended.isPlaying ? "pause.fill" : "play.fill")
+                            SwiftUI.Image(systemName: recomended.isPlaying ? "pause.fill" : "play.fill")
                                 .font(.title2)
                                 .padding()
                                 .background(Color.white)
@@ -119,6 +154,7 @@ struct RecommendationView: View {
         .task {
             await recomended.fetchQuote(mood: mood)
             await recomended.fetchSong(mood: mood)
+            await recomended.fetchShow(mood: mood)
         }
     }
 }
@@ -126,7 +162,5 @@ struct RecommendationView: View {
 #Preview {
     RecommendationView(mood: .Happy)
 }
-#Preview {
-    RecommendationView(mood: .Happy)
-}
+
 

@@ -6,3 +6,17 @@
 //
 
 import Foundation
+
+struct ShowResponse: Decodable {
+    let show: Show
+}
+
+struct Show: Decodable {
+    let name: String
+    let summary: String?
+    let image: ImageMovie?
+}
+
+struct ImageMovie: Decodable {
+    let medium: String?
+}
