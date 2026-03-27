@@ -9,90 +9,111 @@ import Foundation
 import Combine
 import AVFoundation
 
-class RecommendationViewModel : ObservableObject {
+@MainActor
+class RecommendationViewModel: ObservableObject {
     
     @Published var quote: Quote?
     @Published var firstSong: Song?
-    @Published var isLoading = false
-    @Published var errorMessage: String?
+    @Published var isSongLoading = false
+    @Published var isQuoteLoading = false
+    @Published var isShowLoading = false
+    @Published var songErrorMessage: String?
+    @Published var quoteErrorMessage: String?
+    @Published var showErrorMessage: String?
     @Published var show: Show?
     
     @Published var isPlaying = false
     
     var player: AVPlayer?
     
-    let networkClient = NetworkClient()
-    
-    var quoteDisplayText: String {
-        if isLoading {
-            "Loading"
-        } else if let quote = quote {
-            "\"\(quote.quote)\"\n\n - \(quote.author)"
-        } else {
-            errorMessage ?? "Something went wrong"
+    var hasPreview: Bool {
+        if let previewUrl = firstSong?.previewUrl {
+            return !previewUrl.isEmpty
         }
+        return false
     }
     
-    var songDisplay: String {
-        if isLoading {
-            return "Loading..."
-        } else if let song = firstSong {
-            let title = song.trackName ?? "Unknown title"
-            let artist = song.artistName ?? "Unknown artist"
-            return "\(title)\n\n— \(artist)"
+    let networkClient = NetworkClient()
+    
+    func loadContent(for mood:Mood) async {
+        quoteErrorMessage = nil
+        songErrorMessage = nil
+        showErrorMessage = nil
+        await fetchQuote(mood: mood)
+        await fetchSong(mood: mood)
+        await fetchShow(mood: mood)
+    }
+
+    
+    var quoteDisplayText: String {
+        if let quote = quote {
+            "\"\(quote.quote)\"\n\n- \(quote.author)"
         } else {
-            return errorMessage ?? "Something went wrong"
+            quoteErrorMessage ?? "Could not load quotes"
         }
     }
     
     func fetchSong(mood: Mood) async {
-        isLoading = true
-        errorMessage = nil
+        isSongLoading = true
+        songErrorMessage = nil
+        
+        defer {
+            isSongLoading = false
+        }
         
         do {
             let result = try await networkClient.fetchSong(mood: mood)
             firstSong = result
+            print("New song", result.trackName ?? "nil")
         } catch {
-            errorMessage = error.localizedDescription
+            if let urlError = error as? URLError, urlError.code == .cancelled {
+                return
+            }
+            
+            songErrorMessage = error.localizedDescription
         }
-        
-        isLoading = false
     }
     func fetchShow(mood: Mood) async {
+        isShowLoading = true
+        showErrorMessage = nil
+        
+        defer {
+            isShowLoading = false
+        }
         
         do {
             let result = try await networkClient.fetchShow(mood: mood)
             show = result
+            print("New show", result.name)
         } catch {
-            print(error)
+            if let urlError = error as? URLError, urlError.code == .cancelled {
+                return
+            }
+            showErrorMessage = error.localizedDescription
         }
     }
 
     
     func fetchQuote(mood: Mood) async {
-        isLoading = true
-        errorMessage = nil
+        isQuoteLoading = true
+        quoteErrorMessage = nil
         
-        print("API KEY:", Config.apiKey)
+        defer {
+            isQuoteLoading = false
+        }
         
         do {
             let result = try await networkClient.fetchQuote(mood: mood)
             quote = result
+            print("New Quote", result.quote)
         } catch {
-            print(error)
-            errorMessage = error.localizedDescription
+            if let urlError = error as? URLError, urlError.code == .cancelled {
+                return
+            }
+            quoteErrorMessage = error.localizedDescription
         }
-        
-        isLoading = false
     }
     
-    func playPreview() {
-        guard let urlString = firstSong?.previewUrl,
-              let url = URL(string: urlString) else { return }
-        
-        player = AVPlayer(url: url)
-        player?.play()
-    }
     func togglePlay() {
             guard let urlString = firstSong?.previewUrl,
                   let url = URL(string: urlString) else { return }

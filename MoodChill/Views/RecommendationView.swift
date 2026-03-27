@@ -9,7 +9,7 @@ import SwiftUI
 
 struct RecommendationView: View {
     
-    @StateObject private var recomended = RecommendationViewModel()
+    @StateObject private var recommended = RecommendationViewModel()
     let mood: Mood
     
     var body: some View {
@@ -19,142 +19,33 @@ struct RecommendationView: View {
                 .ignoresSafeArea()
             
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: Spacing.medium) {
                     
+            MoodHeader(mood: mood)
                     
-                    VStack(spacing: 8) {
-                        Text("Today's Mood")
-                            .font(.subheadline)
-                            .opacity(0.8)
+                    VStack(spacing: Spacing.large) {
+                
+            QuoteSection(recommended: recommended,mood: mood)
                         
-                        Text(mood.title)
-                            .font(.largeTitle)
-                            .fontWeight(.bold)
+            MusicSection(recommended: recommended, mood: mood)
+
+            ShowSection(recommended: recommended, mood: mood)
+                        
                     }
-                    .padding(.bottom, 10)
-                    
-                    VStack(spacing: 30) {
-                        SectionCardView(
-                            title: "Quote",
-                            text: recomended.quoteDisplayText
-                        )
-                        
-                        if let song = recomended.firstSong,
-                           let imageUrl = song.artworkUrl100 {
-                            
-                            let highRes = imageUrl.replacingOccurrences(of: "100x100", with: "600x600")
-                            
-                            if let url = URL(string: highRes) {
-                                
-                                VStack(spacing: 12) {
-                                    
-                                    AsyncImage(url: url) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                    } placeholder: {
-                                        ProgressView()
-                                    }
-                                    .frame(height: 180)
-                                    .clipped()
-                                    .cornerRadius(16)
-                                    
-                                    Text(song.trackName ?? "Unknown")
-                                        .font(.headline)
-                                    
-                                    Text(song.artistName ?? "Unknown")
-                                        .font(.subheadline)
-                                        .opacity(0.7)
-                                }
-                                .padding()
-                                .background(
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .fill(Color.black.opacity(0.7))
-                                )
-                            }
-                        }
-                        
-                        if let show = recomended.show {
-                            
-                            VStack(spacing: 12) {
-                                
-                                if let imageUrl = show.image?.medium,
-                                   let url = URL(string: imageUrl) {
-                                    
-                                    AsyncImage(url: url) { image in
-                                        image
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(maxWidth: .infinity)
-                                    } placeholder: {
-                                        ProgressView()
-                                    }
-                                    .frame(height: 180)
-                                    .clipped()
-                                    .cornerRadius(16)
-                                    
-                                    Text(show.name)
-                                        .font(.headline)
-                                    
-                                    if let summary = show.summary {
-                                        Text(summary.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression))
-                                            .font(.subheadline)
-                                            .opacity(0.8)
-                                            .lineLimit(3)
-                                    }
-                                }
-                            }
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 20)
-                                    .fill(Color.black.opacity(0.7))
-                            )
-                        }
-                    }
-                    
                 }
                 .padding()
-                .padding(.bottom, recomended.firstSong != nil ? 100 : 0)
+                .padding(.bottom, recommended.hasPreview ? 100 : 0)
+            }
+            .refreshable {
+                await recommended.loadContent(for: mood)
             }
             
+            MiniPlayerView(recommended: recommended)
             
-            if let song = recomended.firstSong {
-                VStack {
-                    Spacer()
-                    
-                    HStack {
-                        VStack(alignment: .leading) {
-                            Text(song.trackName ?? "Unknown")
-                                .font(.headline)
-                            
-                            Text(song.artistName ?? "")
-                                .font(.subheadline)
-                                .opacity(0.7)
-                        }
-                        
-                        Spacer()
-                        
-                        Button {
-                            recomended.togglePlay()
-                        } label: {
-                            SwiftUI.Image(systemName: recomended.isPlaying ? "pause.fill" : "play.fill")
-                                .font(.title2)
-                                .padding()
-                                .background(Color.white)
-                                .clipShape(Circle())
-                        }
-                    }
-                    .padding()
-                    .background(.ultraThinMaterial)
-                    .cornerRadius(20)
-                    .padding()
-                }
             }
-        }
+        
         .task {
-            await recomended.fetchQuote(mood: mood)
-            await recomended.fetchSong(mood: mood)
-            await recomended.fetchShow(mood: mood)
+            await recommended.loadContent(for: mood)
         }
     }
 }

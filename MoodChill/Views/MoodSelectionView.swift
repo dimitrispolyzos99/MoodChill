@@ -25,7 +25,7 @@ struct MoodSelectionView: View {
                 VStack {
                     
                     
-                    VStack(spacing: 10) {
+                    VStack(spacing: Spacing.large) {
                         if let weather = moodSVM.weather {
                             Text("Athens Greece \n Today's weather: \(weather.temp_C)°C \(Image(systemName: moodSVM.getWeatherIcon(for: weather.weatherCode)))")
                                 .symbolRenderingMode(.multicolor)
@@ -43,7 +43,7 @@ struct MoodSelectionView: View {
                                 
                                 ForEach(Mood.allCases, id: \.self) { mood in
                                     NavigationLink(destination: RecommendationView(mood: mood)) {
-                                        VStack(spacing: 5){
+                                        VStack(spacing: Spacing.small){
                                             Text(mood.title)
                                             Text(mood.symbol)
                                         }

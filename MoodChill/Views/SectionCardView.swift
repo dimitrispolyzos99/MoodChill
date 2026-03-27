@@ -22,7 +22,6 @@ struct SectionCardView: View {
                 .background(
                     RoundedRectangle(cornerRadius: 20)
                         .fill(Color.black.opacity(0.7)))
-                .cornerRadius(30)
                 .shadow(radius: 4)
         }
     }
