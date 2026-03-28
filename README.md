@@ -1,4 +1,6 @@
+
 MoodChill 🎧🌤️
+
 MoodChill is a SwiftUI iOS app that recommends music, quotes, and TV shows based on the user’s current mood.
 
 The app also integrates weather data to create a more dynamic and personalized experience.
@@ -48,11 +50,8 @@ More UI polish and animations
 
 📸 Screenshots
 
-Mood Selection
-![Mood Selection](images/MoodSelection.png)
-
-Recommendation
-![Mood Selection](images/Recommendation.png)
-
-Mini Player
-![Mood Selection](images/MusicPlayer.png)
+<p align="center">
+<img src="images/MoodSelection.png" width="30%"/>
+<img src="images/Recommendation.png" width="30%"/>
+<img src="images/MusicPlayer.png" width="30%"/>
+</p>
