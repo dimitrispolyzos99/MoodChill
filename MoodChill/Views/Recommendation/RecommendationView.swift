@@ -21,7 +21,7 @@ struct RecommendationView: View {
             ScrollView {
                 VStack(spacing: Spacing.medium) {
                     
-            MoodHeader(mood: mood)
+            MoodHeaderView(mood: mood)
                     
                     VStack(spacing: Spacing.large) {
                 

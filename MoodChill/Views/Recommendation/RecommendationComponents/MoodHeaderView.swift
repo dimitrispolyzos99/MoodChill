@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MoodHeader: View {
+struct MoodHeaderView: View {
     let mood: Mood
     var body: some View {
         VStack(spacing: 8) {
@@ -24,5 +24,5 @@ struct MoodHeader: View {
 }
 
 #Preview {
-    MoodHeader(mood: .Happy)
+    MoodHeaderView(mood: .Happy)
 }
