@@ -63,22 +63,18 @@ class NetworkClient {
         return show
     }
     
-    func fetchWeather() async throws -> CurrentCondition {
-
-        guard let url = URL(string: "https://wttr.in/Athens?format=j1") else {
+    func fetchWeather(lat: Double, lon: Double) async throws -> OpenMeteoResponse {
+        
+        let urlString = "https://api.open-meteo.com/v1/forecast?latitude=\(lat)&longitude=\(lon)&current_weather=true"
+        
+        guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
         }
-        
+     
         let (data, _) = try await URLSession.shared.data(from: url)
         
-
-        let response = try JSONDecoder().decode(WeatherResponse.self, from: data)
+        return try JSONDecoder().decode(OpenMeteoResponse.self, from: data)
         
-
-        guard let current = response.current_condition.first else {
-            throw NSError(domain: "No data", code: 0, userInfo: nil)
-        }
-        
-        return current
-    }}
+    }
+  }
 

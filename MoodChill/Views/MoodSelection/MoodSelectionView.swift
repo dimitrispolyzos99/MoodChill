@@ -14,12 +14,11 @@ struct MoodSelectionView: View {
         NavigationStack{
             ZStack {
                 
-                if let code = moodSVM.weather?.weatherCode {
-                    Image(moodSVM.getBackgroundName(for: code))
+                if let weather = moodSVM.weather {
+                    Image(moodSVM.getBackgroundName(for: weather.weathercode, isDay: weather.is_day == 1))
                         .resizable()
                         .scaledToFill()
                         .ignoresSafeArea()
-                        .animation(.easeInOut, value: moodSVM.weather?.weatherCode)
                 } else {
                     Color(.systemBackground).ignoresSafeArea()
                 }
@@ -41,7 +40,8 @@ struct MoodSelectionView: View {
             Spacer()
         }
         .task {
-            await moodSVM.fetchWeather()
+            moodSVM.requestLocation()
+            await moodSVM.fetchWeatherForCurrentLocation()
         }
         
     }

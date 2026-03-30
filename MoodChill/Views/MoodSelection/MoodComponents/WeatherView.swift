@@ -11,13 +11,11 @@ import SwiftUI
 struct WeatherView: View {
     @ObservedObject var moodSVM: MoodSelectionViewModel
     
-    private var locationText: String {
-        "Athens, Greece"
-    }
+
     
     private var weatherText: String {
         if let weather = moodSVM.weather {
-            return "Today's weather: \(weather.temp_C)°C"
+            return "Today's weather: \(Int(weather.temperature))°C"
         } else {
             return "Fetching weather..."
         }
@@ -25,7 +23,7 @@ struct WeatherView: View {
     
     private var weatherIconName: String? {
         if let weather = moodSVM.weather {
-            return moodSVM.getWeatherIcon(for: weather.weatherCode)
+            return moodSVM.getWeatherIcon(for: weather.weathercode, isDay: weather.is_day == 1)
         }
         return nil
     }
@@ -34,7 +32,7 @@ struct WeatherView: View {
         MoodCardView{
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(locationText)
+                    Text(moodSVM.locationManager.cityName)
                         .font(.headline)
                     
                     Text(weatherText)

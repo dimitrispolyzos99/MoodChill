@@ -10,20 +10,12 @@ import Foundation
 
 import Foundation
 
-struct WeatherResponse: Decodable {
-    let current_condition: [CurrentCondition]
+struct OpenMeteoResponse: Decodable {
+    let current_weather: CurrentWeather
 }
 
-struct CurrentCondition: Decodable {
-    let temp_C: String
-    let weatherCode: String
-    let weatherDesc: [Description]
-
-    var descriptionText: String {
-        weatherDesc.first?.value ?? "Unknown"
-    }
-}
-
-struct Description: Decodable {
-    let value: String
+struct CurrentWeather: Decodable {
+    let temperature: Double
+    let weathercode: Int
+    let is_day: Int
 }
